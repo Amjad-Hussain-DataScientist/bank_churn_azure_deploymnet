@@ -35,18 +35,31 @@ class ModelTrainer:
             model = CatBoostClassifier(
                 verbose=False
             )
+            param_grid = {
+                            "iterations": [500,700,1000],
+                            "learning_rate": [0.03,0.05,0.07,0.1],
+                             "depth": [4,5,6,7,8],
+                            "l2_leaf_reg": [1, 3, 5, 7, 9],
+                            "border_count": [32, 64, 128, 255],
+                             "bagging_temperature": [0, 1, 3, 5],
+                             "random_strength": [1, 5, 10],
+                             "bootstrap_type": ["Bayesian"],
+                             #"subsample": [0.6, 0.8, 1.0]
+                        }
             model_report= evaluate_model(X_train=X_train,y_train=y_train,X_test=X_test,
-                                               y_test=y_test,model = model)
-            logging.info("model train and evaluted successfully")
+                                               y_test=y_test,model = model,param = param_grid)
+            best_model = model_report['model_']
+            logging.info("model train with parameters and evaluted successfully")
+
             save_object(
                 # save the model
                 file_path=self.model_trainer_config.train_model_file_path,
-                obj=model # convert into pkl file model.pkl
+                obj=best_model # convert into pkl file model.pkl
             )
-            logging.info("model is saved successfully")
+            logging.info(" tuned model is saved successfully")
 
             # to see the predicted o/p for test data
-            predicted = model.predict(X_test)
+            predicted = best_model.predict(X_test)
             accuracy = accuracy_score(y_test,predicted)
             return accuracy
         except Exception as e:
