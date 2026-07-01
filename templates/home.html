@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bank Customer Churn Prediction</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+
+background:linear-gradient(135deg,#0F172A,#172554,#1E3A8A);
+min-height:100vh;
+color:white;
+overflow-x:hidden;
+
+}
+
+body::before{
+
+content:'';
+position:fixed;
+width:600px;
+height:600px;
+background:#3B82F6;
+filter:blur(180px);
+opacity:.18;
+left:-150px;
+top:-150px;
+
+}
+
+body::after{
+
+content:'';
+position:fixed;
+width:500px;
+height:500px;
+background:#06B6D4;
+filter:blur(180px);
+opacity:.18;
+right:-150px;
+bottom:-150px;
+
+}
+
+.container{
+
+width:95%;
+max-width:1200px;
+margin:auto;
+padding:40px 0;
+position:relative;
+z-index:10;
+
+}
+
+.header{
+
+text-align:center;
+margin-bottom:40px;
+
+}
+
+.header h1{
+
+    font-size:48px;
+    font-weight:700;
+    margin-bottom:10px;
+    background:linear-gradient(to right,#38BDF8,#60A5FA,#A78BFA);
+
+    background-clip:text;
+    -webkit-background-clip:text;
+
+    color:transparent;
+    -webkit-text-fill-color:transparent;
+
+}
+
+.header h3{
+
+font-size:22px;
+font-weight:500;
+margin-bottom:20px;
+color:#CBD5E1;
+
+}
+
+.header p{
+
+max-width:900px;
+margin:auto;
+font-size:17px;
+line-height:1.8;
+color:#E2E8F0;
+
+}
+
+.main-card{
+
+margin-top:40px;
+
+background:rgba(255,255,255,.08);
+
+border:1px solid rgba(255,255,255,.12);
+
+backdrop-filter:blur(15px);
+
+border-radius:20px;
+
+padding:40px;
+
+box-shadow:0 10px 40px rgba(0,0,0,.35);
+
+}
+
+.section-title{
+
+font-size:28px;
+font-weight:600;
+margin-bottom:30px;
+text-align:center;
+
+}
+
+.form-grid{
+
+display:grid;
+
+grid-template-columns:repeat(2,1fr);
+
+gap:25px;
+
+}
+
+.form-group{
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+.form-group label{
+
+margin-bottom:8px;
+
+font-weight:500;
+
+color:#E0F2FE;
+
+}
+
+.form-group input,
+
+.form-group select{
+
+padding:14px;
+
+border:none;
+
+border-radius:12px;
+
+font-size:15px;
+
+background:#F8FAFC;
+
+color:#0F172A;
+
+transition:.3s;
+
+}
+
+.form-group input:focus,
+
+.form-group select:focus{
+
+outline:none;
+
+transform:scale(1.02);
+
+box-shadow:0 0 15px rgba(56,189,248,.5);
+
+}
+
+.full{
+
+grid-column:1/3;
+
+}
+
+.predict-btn{
+
+width:100%;
+
+padding:18px;
+
+font-size:18px;
+
+font-weight:700;
+
+border:none;
+
+border-radius:15px;
+
+background:linear-gradient(135deg,#0EA5E9,#2563EB);
+
+color:white;
+
+cursor:pointer;
+
+transition:.3s;
+
+}
+
+.predict-btn:hover{
+
+transform:translateY(-3px);
+
+box-shadow:0 10px 25px rgba(59,130,246,.45);
+
+}
+
+.result{
+
+margin-top:35px;
+
+padding:25px;
+
+border-radius:18px;
+
+text-align:center;
+
+font-size:28px;
+
+font-weight:700;
+
+display:none;
+
+}
+
+.result.show{
+
+display:block;
+
+}
+
+.result.success{
+
+background:rgba(34,197,94,.18);
+
+border:2px solid #22C55E;
+
+color:#BBF7D0;
+
+}
+
+.result.danger{
+
+background:rgba(239,68,68,.18);
+
+border:2px solid #EF4444;
+
+color:#FECACA;
+
+}
+
+.about{
+
+margin-top:50px;
+
+background:rgba(255,255,255,.06);
+
+padding:30px;
+
+border-radius:18px;
+
+line-height:1.9;
+
+color:#E2E8F0;
+
+}
+
+.about h2{
+
+margin-bottom:15px;
+
+color:#7DD3FC;
+
+}
+
+.footer{
+
+margin-top:40px;
+
+text-align:center;
+
+color:#CBD5E1;
+
+font-size:15px;
+
+}
+
+@media(max-width:850px){
+
+.form-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.full{
+
+grid-column:1;
+
+}
+
+.header h1{
+
+font-size:36px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<h1>🏦 Bank Customer Churn Prediction</h1>
+
+<h3>Amjad Hussain | Data Scientist & Machine Learning Engineer</h3>
+
+<p>
+
+Predict whether a bank customer is likely to leave the bank using an optimized
+CatBoost Machine Learning model. This application is built as a complete
+end-to-end ML project including data ingestion, preprocessing,
+feature engineering, hyperparameter tuning, model deployment,
+Docker containerization and Azure cloud deployment.
+
+</p>
+
+</div>
+
+<div class="main-card">
+
+<h2 class="section-title">
+
+Customer Information
+
+</h2>
+
+<form action="/prediction" method="POST">
+
+<div class="form-grid">
+
+<div class="form-group">
+
+<label>Credit Score</label>
+
+<input
+type="number"
+name="credit_score"
+placeholder="e.g. 650"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>Age</label>
+
+<input
+type="number"
+name="age"
+placeholder="e.g. 42"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>Country</label>
+
+<select name="country" required>
+
+<option value="">Select Country</option>
+
+<option value="France">France</option>
+
+<option value="Germany">Germany</option>
+
+<option value="Spain">Spain</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+
+<label>Gender</label>
+
+<select name="gender" required>
+
+<option value="">Select Gender</option>
+
+<option value="Male">Male</option>
+
+<option value="Female">Female</option>
+
+</select>
+
+</div>
+                <div class="form-group">
+
+                    <label>Tenure (Years)</label>
+
+                    <input
+                    type="number"
+                    name="tenure"
+                    min="0"
+                    max="10"
+                    placeholder="e.g. 5"
+                    required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Balance ($)</label>
+
+                    <input
+                    type="number"
+                    step="0.01"
+                    name="balance"
+                    placeholder="e.g. 65000"
+                    required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Number of Products</label>
+
+                    <select name="products_number" required>
+
+                        <option value="">Select</option>
+
+                        <option value="1">1 Product</option>
+
+                        <option value="2">2 Products</option>
+
+                        <option value="3">3 Products</option>
+
+                        <option value="4">4 Products</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Owns Credit Card</label>
+
+                    <select name="credit_card" required>
+
+                        <option value="">Select</option>
+
+                        <option value="1">Yes</option>
+
+                        <option value="0">No</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Active Member</label>
+
+                    <select name="active_member" required>
+
+                        <option value="">Select</option>
+
+                        <option value="1">Yes</option>
+
+                        <option value="0">No</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Estimated Salary ($)</label>
+
+                    <input
+                    type="number"
+                    step="0.01"
+                    name="estimated_salary"
+                    placeholder="e.g. 85000"
+                    required>
+
+                </div>
+
+                <div class="full">
+
+                    <button
+                    type="submit"
+                    class="predict-btn">
+
+                        🔍 Predict Customer Churn
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+
+{% if results is defined %}
+
+{% if results == 1 %}
+
+<div class="result danger show">
+
+<h2>⚠ Customer is likely to CHURN</h2>
+
+<br>
+
+<p>
+
+Our machine learning model predicts that this customer has a high
+probability of leaving the bank.
+
+The bank should consider proactive retention strategies such as
+personalized offers, loyalty rewards, or direct customer engagement.
+
+</p>
+
+</div>
+
+{% else %}
+
+<div class="result success show">
+
+<h2>✅ Customer is likely to STAY</h2>
+
+<br>
+
+<p>
+
+Our machine learning model predicts that this customer is likely to
+remain with the bank.
+
+Current engagement appears healthy and no immediate retention action
+is required.
+
+</p>
+
+</div>
+
+{% endif %}
+
+{% endif %}
+
+<div class="about">
+
+<h2>🏦 About This Project</h2>
+
+<p>
+
+This application predicts whether a bank customer is likely to churn
+using an optimized <strong>CatBoost Classifier</strong>.
+
+The project demonstrates a complete end-to-end Machine Learning
+workflow including Data Ingestion, Data Validation,
+Feature Engineering, Data Transformation,
+Hyperparameter Tuning, Model Training,
+Flask Deployment, Docker Containerization,
+Azure Cloud Deployment and CI/CD with GitHub Actions.
+
+</p>
+
+</div>
+
+<div class="footer">
+
+<p>
+
+Developed by <strong>Amjad Hussain</strong>
+
+</p>
+
+<br>
+
+<p>
+
+Python • CatBoost • Scikit-Learn • Flask • Docker • Azure • GitHub Actions
+
+</p>
+
+</div>
+
+</div>
+
+</body>
+
+</html>
